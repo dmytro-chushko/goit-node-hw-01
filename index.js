@@ -1,31 +1,31 @@
-const argv = require('yargs').argv;
-const { hideBin } = require('yargs/helpers');
+const { program } = require('commander');
 const {
-  contactsPath,
-  listContacts,
+  ActionlistContacts,
   getContactsById,
   removeContact,
   addContact,
 } = require('./contacts');
 
-console.log(argv);
-
-function invokeAction({ action, id, name, email, phone }) {
+async function invokeAction({ action, id, name, email, phone }) {
   switch (action) {
     case 'list':
-      listContacts();
+      const contacts = await listContacts();
+      console.log(contacts);
       break;
 
     case 'get':
-      // ... id
+      const contactById = await getContactsById(id);
+      console.log(contactById);
       break;
 
     case 'add':
-      // ... name email phone
+      const newContact = await addContact(name, email, phone);
+      console.log(newContact);
       break;
 
     case 'remove':
-      // ... id
+      const deletedContact = await removeContact(id);
+      console.log(deletedContact);
       break;
 
     default:
@@ -33,4 +33,14 @@ function invokeAction({ action, id, name, email, phone }) {
   }
 }
 
-// invokeAction(argv);
+program
+  .option('-a, --action <type>')
+  .option('-i, --id <type>')
+  .option('-n, --name <type>')
+  .option('-e, --email <type>')
+  .option('-ph, --phone <type>');
+
+program.parse(process.argv);
+const options = program.opts();
+
+invokeAction(options);
